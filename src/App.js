@@ -20,7 +20,7 @@ const App = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("/api").then(response => {
+    axios.get("https://asr-network-api.herokuapp.com/api").then(response => {
       console.log(response.data);
     }).catch(error => {
       console.log(error);
