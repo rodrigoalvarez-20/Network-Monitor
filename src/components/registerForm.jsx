@@ -35,13 +35,15 @@ const formItems = [
         "name": "password",
         "type": "password",
         "label": "Contraseña",
-        "placeholder": "********"
+        "placeholder": "********",
+        "size": 8
     },
     {
         "name": "confirm_password",
         "type": "password",
         "label": "Confirmar contraseña",
-        "placeholder": "********"
+        "placeholder": "********",
+        "size": 8
     }
 ]
 
@@ -102,7 +104,7 @@ const RegisterForm = ({ token, onSuccesAction }) => {
                 <Form onSubmit={submitForm}>
                     <Row>
                         {
-                            formItems.map(({ name, label, type, placeholder }) => {
+                            formItems.map(({ name, label, type, placeholder, size }) => {
                                 return (
                                     <Col xs={12} md={6} lg={4} style={{ "margin": "8px 0" }} key={name}>
                                         <Form.Group>
@@ -112,6 +114,7 @@ const RegisterForm = ({ token, onSuccesAction }) => {
                                                 placeholder={placeholder}
                                                 value={registerFormValues[[name]]}
                                                 required={true}
+                                                minLength={size}
                                                 type={type}
                                                 onChange={updateValue} />
                                         </Form.Group>

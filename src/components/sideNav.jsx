@@ -27,7 +27,7 @@ const routes = [
     },
     {
         "name": "Consultar topologia",
-        "route": "/topology",
+        "route": "/network",
         "icon": net
     },
     {

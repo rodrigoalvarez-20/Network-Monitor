@@ -1,7 +1,6 @@
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Col, Row } from 'react-bootstrap';
 import TopBar from './components/topBar';
-import Home from './pages/home';
 import SideNav from './components/sideNav';
 import Login from './pages/login';
 
@@ -11,6 +10,8 @@ import axios from "axios";
 import { validateToken } from './utils/common';
 import RestorePassword from './pages/restore_password';
 import UsersPage from './pages/users_page';
+import NetworkMap from './pages/network_map';
+import Home from './pages/home';
 
 
 const App = () => {
@@ -71,6 +72,7 @@ const App = () => {
               isUserLogged ? 
               <>
                 <Route path="/" element={<Home />} />
+                <Route path="/network" element={<NetworkMap />} />
                 <Route path="/users" element={<UsersPage />} />
               </> :
               <>
