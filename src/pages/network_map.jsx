@@ -1,6 +1,6 @@
 import Network from "react-graph-vis";
 import axios from "axios";
-import { Container } from "react-bootstrap";
+import { Container, Offcanvas } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { ToastContainer, toast } from 'react-toastify';
@@ -9,13 +9,25 @@ const NetworkMap = () => {
 
     const [networkNodes, setNetworkNodes] = useState([]);
     const [networkEdges, setNetworkEdges] = useState([]);
+    const [fullSchema, setFullSchema] = useState({});
+    const [selectedRouter, setSelectedRouter] = useState({});
+    const [displayProps, setDisplayProps] = useState(false);
     const [cookies, state] = useCookies(['token']);
+
+    const prefPanelOptions = [
+        {
+            "label": "Nombre del dispositivo",
+            "name": "",
+            "value": "",
+            "type": ""
+        }
+    ]
 
 
     useEffect(() => {
         axios.get("/api/routers/graph", {headers: { "Authorization": cookies.token }}).then(response => {
             const {schema} = response.data;
-            console.log(schema)
+            setFullSchema(schema);
 
             if (schema.length === 0){
                 //
@@ -50,13 +62,18 @@ const NetworkMap = () => {
 
     const events = {
         select: function (event) {
-            var { nodes, edges } = event;
-            console.log("nodes");
-            console.log(nodes);
-            console.log("edges")
-            console.log(edges);
+            var { nodes } = event;
+            if (fullSchema[nodes[0]] !== undefined){
+                setSelectedRouter(fullSchema[nodes[0]]);
+                setDisplayProps(true);
+            }
         }
     };
+
+    const hidePropsPanel = () => {
+        setSelectedRouter({});
+        setDisplayProps(false);
+    }
 
     return (
         <Container style={{"margin":"12px auto"}}>
@@ -67,6 +84,15 @@ const NetworkMap = () => {
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick />
+            <Offcanvas show={displayProps} placement="end" onHide={hidePropsPanel}>
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Offcanvas</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    Some text as placeholder. In real life you can have the elements you
+                    have chosen. Like, text, images, lists, etc.
+                </Offcanvas.Body>
+            </Offcanvas>
             <Network
                 style={{ "backgroundColor": "#F9F3EE", "height": "80vh"}}
                 graph={{ nodes: networkNodes, edges: networkEdges }}

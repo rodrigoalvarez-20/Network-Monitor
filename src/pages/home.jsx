@@ -1,18 +1,20 @@
-import { Container, Button, Row, Col, Form } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useCookies } from "react-cookie";
-import axios from "axios";
+import { available_logs, update_intervals } from "../utils/common";
+import Selector from "../components/selector";
 
 const Home = () => {
 
     const [sckConn, setSckConn] = useState(null);
     const [logText, setLogText] = useState("");
+    const [selectedLogs, setSelectedLogs] = useState("all");
+    const [logsInterval, setLogsInterval] = useState(5);
     const [cookies, state] = useCookies(['token']);
 
     useEffect(() => {
         const logsCont = window.document.getElementById("logs_container");
-        logsCont.scrollTop = logsCont.scrollHeight;
         const sck = io("http://127.0.0.1:5000/", {
             cors: {
                 credentials: true,
@@ -22,20 +24,22 @@ const Home = () => {
             rejectUnauthorized: false
         });
 
-        sck.on("conn-resp", () => {
+        sck.on("conn-resp", ({ log_name, interval }) => {
             console.log("Socket connected");
-            sck.emit("get_log", null);
+            setSelectedLogs(log_name)
+            setLogsInterval(interval)
+            sck.emit("get_log");
             setSckConn(sck);
         });
 
         sck.on("log_data", ({ log, name }) => {
             console.log("Recibiendo datos de: " + name)
-            /* if (text === undefined) {
+            if (log === null || log === undefined) {
                 setLogText("No se han encontrado logs");
             } else {
-                setLogText(text.join("\n"));
+                setLogText(log.join("\n"));
             }
-            logsCont.scrollTop = logsCont.scrollHeight; */
+            logsCont.scrollTop = logsCont.scrollHeight;
         });
 
         return () => {
@@ -47,44 +51,18 @@ const Home = () => {
 
     }, []);
 
-    const get_log = (e) => {
+    const update_selected_log = (e) => {
         if (sckConn !== null) {
-            sckConn.emit("get_log", e.target.value !== "all" ? e.target.value : null);
+            sckConn.emit("update_selected_log_prefs", e.target.value !== "all" ? e.target.value : null);
+            setSelectedLogs(e.target.value)
         }
     }
 
-    const update_wait_time = () => {
-        axios.post()
-    }
-
-    const available_logs = [
-        { "value": "all", "label": "Todos los logs" },
-        { "value": "general", "label": "Logs generales" },
-        { "value": "network", "label": "Logs de la red" },
-        { "value": "users", "label": "Logs de usuarios" },
-        { "value": "mapping", "label": "Logs del mapeo" },
-    ]
-
-    const update_values = [
-        { "value": 5, "label": "5 segundos" },
-        { "value": 10, "label": "10 segundos" },
-        { "value": 15, "label": "15 segundos" },
-        { "value": 20, "label": "20 segundos" },
-        { "value": 30, "label": "30 segundos" }
-    ]
-
-    function renderSelector(data, action) {
-        return (
-            <Form.Select style={{}} onChange={action} >
-                {
-                    data.map((item, i) => {
-                        return (
-                            <option key={i} value={item.value}>{item.label}</option>
-                        )
-                    })
-                }
-            </Form.Select>
-        )
+    const update_log_interval = (e) => {
+        if (sckConn !== null) {
+            sckConn.emit("update_timer_logs_prefs", parseInt(e.target.value));
+            setLogsInterval(parseInt(e.target.value));
+        }
     }
 
     return (
@@ -94,13 +72,13 @@ const Home = () => {
                 <Col xs={12} sm={4}>
                     <Form.Group className="mb-3">
                         <Form.Label>Archivo de logs seleccionado</Form.Label>
-                        {renderSelector(available_logs, get_log)}
+                        <Selector dataset={available_logs} def_value={selectedLogs} action={update_selected_log} />
                     </Form.Group>
                 </Col>
                 <Col xs={12} sm={4}>
                     <Form.Group className="mb-3">
                         <Form.Label>Intervalo de actualización</Form.Label>
-                        {renderSelector(update_values, null)}
+                        <Selector dataset={update_intervals} def_value={logsInterval} action={update_log_interval} />
                     </Form.Group>
                 </Col>
             </Row>

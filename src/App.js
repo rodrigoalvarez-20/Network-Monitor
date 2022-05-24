@@ -12,6 +12,7 @@ import RestorePassword from './pages/restore_password';
 import UsersPage from './pages/users_page';
 import NetworkMap from './pages/network_map';
 import Home from './pages/home';
+import ConfigsPage from './pages/configurations';
 
 
 const App = () => {
@@ -66,19 +67,20 @@ const App = () => {
               <SideNav />
             </Col> : null
         }
-        <Col xs={ isUserLogged ? 10 : 12}>
+        <Col xs={isUserLogged ? 10 : 12}>
           <Routes>
             {
-              isUserLogged ? 
-              <>
-                <Route path="/" element={<Home />} />
-                <Route path="/network" element={<NetworkMap />} />
-                <Route path="/users" element={<UsersPage />} />
-              </> :
-              <>
-                <Route path="/login" element={<Login />} />
-                <Route path="/services/restore" element={<RestorePassword />} />
-              </>
+              isUserLogged ?
+                <>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/network" element={<NetworkMap />} />
+                  <Route path="/users" element={<UsersPage />} />
+                  <Route path="/settings" element={<ConfigsPage />} />
+                </> :
+                <>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/services/restore" element={<RestorePassword />} />
+                </>
             }
           </Routes>
         </Col>
