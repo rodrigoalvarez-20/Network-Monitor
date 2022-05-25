@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Col, Container, Form, Row, Button, Spinner } from "react-bootstrap";
 import { useCookies } from "react-cookie";
 import Selector from "../components/selector";
-import { available_logs, update_intervals, lost_percentage } from "../utils/common";
+import { available_logs, update_intervals, packets_intervals } from "../utils/common";
 import { ToastContainer, toast } from 'react-toastify';
 
 const ConfigsPage = () => {
@@ -14,7 +14,10 @@ const ConfigsPage = () => {
         logs_timer: 5,
         map_interval: 5,
         interface_interval: 5,
-        lost_packets_percentage: 10
+        device_interval: 5,
+        received_packets_percentage: 10,
+        lost_packets_percentage: 10,
+        damaged_packets_percentage: 10
     })
 
     const [isLoading, setIsLoading] = useState(false);
@@ -39,23 +42,40 @@ const ConfigsPage = () => {
             select_name: "map_interval"
         },
         {
-            label: "Actualización de interfaz monitoreada",
+            label: "Actualización de interfaz",
             dataset: update_intervals,
             selected: appConfigs.interface_interval,
             select_name: "interface_interval"
         },
         {
-            label: "Porcentaje de paquetes perdidos",
-            dataset: lost_percentage,
+            label: "Actualización del dispositivo",
+            dataset: update_intervals,
+            selected: appConfigs.device_interval,
+            select_name: "device_interval"
+        },
+        {
+            label: "% paquetes recibidos",
+            dataset: packets_intervals,
+            selected: appConfigs.received_packets_percentage,
+            select_name: "received_packets_percentage"
+        },
+        {
+            label: "% paquetes perdidos",
+            dataset: packets_intervals,
             selected: appConfigs.lost_packets_percentage,
             select_name: "lost_packets_percentage"
+        },
+        {
+            label: "% paquetes dañados",
+            dataset: packets_intervals,
+            selected: appConfigs.damaged_packets_percentage,
+            select_name: "damaged_packets_percentage"
         }
     ]
 
     useEffect(() => {
         axios.get("/api/app/configurations", { headers: { "Authorization": cookies.token } }).then(configRsp => {
-            //console.log(configRsp.data);
-            setAppConfigs(configRsp.data["configs"])
+            setAppConfigs({ ...appConfigs, ...configRsp.data["configs"] })
         }).catch(configsErr => {
             console.log(configsErr);
             if (configsErr.response.data) {

@@ -1,0 +1,14 @@
+<Row style={{ "margin": "6px 8px" }}>
+                        <Col xs={12}>Interfaces</Col>
+                        <Form.Select aria-label="interface-selector" style={{ "margin": "4px"}}>
+                            {
+                                Object.keys(selectedRouter).length > 0 ?
+                                    selectedRouter["interfaces"].map(int => {
+                                        return (
+                                            <option value={int["interface"]} key={int["ip"]}>{int["interface"]}</option>
+                                        )
+                                    }) : null
+                            }
+                        </Form.Select>
+
+                    </Row>

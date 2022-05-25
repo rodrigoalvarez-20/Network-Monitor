@@ -22,7 +22,7 @@ const update_intervals = [
     { "value": 600, "label": "10 minutos" }
 ]
 
-const lost_percentage = [
+const packets_intervals = [
     { "value": 10, "label": "10%" },
     { "value": 15, "label": "15%" },
     { "value": 20, "label": "20%" },
@@ -49,4 +49,4 @@ function _wait(ms = 5000){
     return new Promise(r => setTimeout(r, ms));
 }
 
-export { validateToken, hash_md5, _wait, update_intervals, available_logs, lost_percentage }
+export { validateToken, hash_md5, _wait, update_intervals, available_logs, packets_intervals }
