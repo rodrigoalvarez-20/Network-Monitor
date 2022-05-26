@@ -11,7 +11,11 @@ const NetworkMap = () => {
     const [networkEdges, setNetworkEdges] = useState([]);
     const [fullSchema, setFullSchema] = useState({});
     const [selectedRouter, setSelectedRouter] = useState({});
-    const [selectedRouterName, setSelectedRouterName] = useState("");
+    const [selectedRouterDefaults, setSelectedRouterDefaults] = useState({
+        "snmp-v3": false,
+        "name": "",
+        "ssh_v2": false
+    });
     const [displayProps, setDisplayProps] = useState(false);
     const [isMonLoading, setIsMonLoading] = useState(false);
     const {isUpdateLoading, setIsUpdateLoading} = useState(false);
@@ -90,7 +94,11 @@ const NetworkMap = () => {
             var router_name = nodes[0];
             if (fullSchema[router_name]) {
                 setSelectedRouter(fullSchema[router_name]);
-                setSelectedRouterName(fullSchema[router_name]["name"]);
+                setSelectedRouterDefaults({
+                    "name": fullSchema[router_name]["name"],
+                    "ssh_v2": fullSchema[router_name]["ssh_v2"],
+                    "snmp-v3": fullSchema[router_name]["snmp-v3"]
+                })
                 setDisplayProps(true);
             }
         }
@@ -103,9 +111,80 @@ const NetworkMap = () => {
 
     const updateRouterProps = (e) => {
         e.preventDefault();
-        console.log(selectedRouter)
-        fullSchema[selectedRouterName] = selectedRouter;
-        console.log("To update: " + selectedRouterName);
+
+        var { name, ssh_v2, type, route, ip } = selectedRouter;
+        var snmpv3 = selectedRouter["snmp-v3"];
+
+        if (name.length < 2){
+            toast.error("El nombre del router debe de tener +2 caracteres")
+        }else {    
+            setIsUpdateLoading(true);
+            const original_name = selectedRouterDefaults["name"]; 
+            const original_ssh = selectedRouterDefaults["ssh_v2"]
+            const original_snmp = selectedRouterDefaults["snmp-v3"]
+
+            route = type === "root" ? ip : route.split(",")
+
+            var useSsh = true;
+            var temp_route = [];
+
+            if (selectedRouterDefaults["ssh_v2"] === false || selectedRouterDefaults["ssh_v2"] !== ssh_v2){
+                useSsh = false;
+            }
+            
+            Object.keys(fullSchema).forEach(k => {
+                if(route.includes(fullSchema[k]["ip"])){
+                    temp_route.push(fullSchema[k])
+                }
+            });
+            
+            for (let i in temp_route){
+                console.log("Middle")
+                if(!temp_route[i]["ssh_v2"]){
+                    useSsh = false;
+                    break;
+                } 
+            }
+    
+            var update_params = {
+                original_name, 
+                route,
+                "method": useSsh ? "ssh" : "telnet"
+            }
+            
+            if (name !== original_name){
+                update_params["hostname"] = name;
+            }
+            if (ssh_v2 !== original_ssh){
+                update_params["ssh_v2"] = ssh_v2;
+            }
+            if (snmpv3 !== original_snmp){
+                update_params["snmp-v3"] = snmpv3;
+            }
+
+            if (Object.keys(update_params) < 4){
+                toast.warning("No se ha cambiado ningun valor");
+            }else {
+                console.log(update_params);
+
+                axios.patch("/api/routers/config", update_params, { headers: { "Authorization": cookies.token } }).then(rspUpdate => {
+                    if(rspUpdate.data){
+                        toast.success(rspUpdate.data.message);
+                    }else {
+                        toast.warning("No se ha recibido una respuesta válida del servidor")
+                    }
+                }).catch(errUpdate => {
+                    console.log(errUpdate);
+                    if(errUpdate.response.data){
+                        toast.error(cfgErr.response.data.error);
+                    }else{
+                        toast.error("Ha ocurrido un error en la petición")
+                    }
+                }).finally(() => {
+                    setIsUpdateLoading(false);
+                });
+            }
+        }        
     }
 
     const updateMonitoredDevice = () => {
@@ -183,7 +262,11 @@ const NetworkMap = () => {
                                 
                             </Col>
                             <Col xs={12} sm={6} style={{ "margin": "6px auto", "textAlign": "center" }}>
-                                <Button style={{ "width": "100%" }} variant="outline-info" type="submit">Guardar cambios</Button>
+                            {
+                                isUpdateLoading ? 
+                                    <Spinner animation="border" /> :
+                                    <Button style={{ "width": "100%" }} variant="outline-info" type="submit">Guardar cambios</Button>
+                            }
                             </Col>
                         </Row>
                     </Form>
