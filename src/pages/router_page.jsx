@@ -42,13 +42,16 @@ const RouterPage = () => {
             setNetworkMap(schema);
             setRoutersOptions(routersNames);
             setSelectedRouter(schema[routersNames[0]])
-            updateRoute();
         }).catch(graphErr => {
             if (graphErr.response.data) {
                 toast.error(graphErr.response.data.error);
             }
         })
     }, []);
+
+    useEffect(() => {
+        updateRoute();
+    }, [selectedRouter])
 
     const updateDeviceMonitorStatus = (e) => {
         setMonitorStateLoading(true);
@@ -83,7 +86,7 @@ const RouterPage = () => {
                 <Col xs={12} sm={4}>
                     <Form.Group>
                         <Form.Label>Dispositivo</Form.Label>
-                        <Form.Select onChange={(e) => { setSelectedRouter(networkMap[e.target.value]); updateRoute(); }}>
+                        <Form.Select onChange={(e) => { setSelectedRouter(networkMap[e.target.value]) }}>
                             {
                                 routersOptions.map(r => <option value={r} key={r}>{r}</option>)
                             }
@@ -108,7 +111,7 @@ const RouterPage = () => {
                         <div style={{ "margin": "12px auto" }}>
                             <Tabs defaultActiveKey="users" className="mb-3" mountOnEnter={true} unmountOnExit={true}>
                                 <Tab eventKey="users" title="Usuarios">
-                                    <RouterUsers users={selectedRouter["users"]} />
+                                    <RouterUsers users={selectedRouter["users"]} route={actualRoute} />
                                 </Tab>
                                 <Tab eventKey="interfaces" title="Interfaces">
                                     <RouterInterfaces interfaces={selectedRouter["interfaces"]} device={selectedRouter["name"]} monitor={selectedRouter["monitor_status"]} route={actualRoute} />

@@ -17,7 +17,7 @@ const NetworkMap = () => {
         "ssh_v2": false
     });
     const [displayProps, setDisplayProps] = useState(false);
-    const {isUpdateLoading, setIsUpdateLoading} = useState(false);
+    const [isUpdateLoading, setIsUpdateLoading] = useState(false);
     const [cookies] = useCookies(['token']);
 
     const prefPanelOptions = [
@@ -83,7 +83,7 @@ const NetworkMap = () => {
 
         }).catch(error => {
             console.log(error)
-            toast.error(error.response.data.error);
+            alert(error.response.data.error);
         })
     }, []);
 
@@ -115,14 +115,14 @@ const NetworkMap = () => {
         var snmpv3 = selectedRouter["snmp-v3"];
 
         if (name.length < 2){
-            toast.error("El nombre del router debe de tener +2 caracteres")
+            alert("El nombre del router debe de tener +2 caracteres")
         }else {    
             setIsUpdateLoading(true);
             const original_name = selectedRouterDefaults["name"]; 
             const original_ssh = selectedRouterDefaults["ssh_v2"]
             const original_snmp = selectedRouterDefaults["snmp-v3"]
 
-            route = type === "root" ? ip : route.split(",")
+            route = type === "root" ? [ip] : route.split(",")
 
             var useSsh = true;
             var temp_route = [];
@@ -138,7 +138,6 @@ const NetworkMap = () => {
             });
             
             for (let i in temp_route){
-                console.log("Middle")
                 if(!temp_route[i]["ssh_v2"]){
                     useSsh = false;
                     break;
@@ -162,7 +161,7 @@ const NetworkMap = () => {
             }
 
             if (Object.keys(update_params) < 4){
-                toast.warning("No se ha cambiado ningun valor");
+                alert("No se ha cambiado ningun valor");
             }else {
                 console.log(update_params);
 
@@ -175,9 +174,9 @@ const NetworkMap = () => {
                 }).catch(errUpdate => {
                     console.log(errUpdate);
                     if(errUpdate.response.data){
-                        toast.error(errUpdate.response.data.error);
+                        alert(errUpdate.response.data.error);
                     }else{
-                        toast.error("Ha ocurrido un error en la petición")
+                        alert("Ha ocurrido un error en la petición")
                     }
                 }).finally(() => {
                     setIsUpdateLoading(false);

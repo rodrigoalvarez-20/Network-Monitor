@@ -1,5 +1,16 @@
+import { useState, useEffect } from "react";
 
-const RouterUsers = ({users}) => {
+const RouterUsers = ({users, route}) => {
+
+    const [usersInRouter, setUsersInRouter] = useState([]);
+
+    useEffect(() => {
+        setUsersInRouter(users);
+    },[users])
+
+    useEffect(() => {
+        console.log(usersInRouter)
+    }, [usersInRouter])
 
     return (
         <div>
