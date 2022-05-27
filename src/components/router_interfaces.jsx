@@ -77,7 +77,7 @@ const RouterInterfaces = ({ interfaces, device, monitor = false, route }) => {
             "original_name": device,
             "route": route,
             "method": "ssh",
-            "interfaces": interfacesList
+            "interfaces": configInterfaces
         }
 
         const requests = [

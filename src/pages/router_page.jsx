@@ -117,7 +117,7 @@ const RouterPage = () => {
                                     <RouterInterfaces interfaces={selectedRouter["interfaces"]} device={selectedRouter["name"]} monitor={selectedRouter["monitor_status"]} route={actualRoute} />
                                 </Tab>
                                 <Tab eventKey="protocols" title="Protocolos">
-                                    <RouterProtocols protocols={selectedRouter["protocols"]} />
+                                    <RouterProtocols protocols={selectedRouter["protocols"]} route={actualRoute} />
                                 </Tab>
                                 <Tab eventKey="mib" title="MIB-II">
                                     <RouterMIB protocols={selectedRouter["mib"]} />

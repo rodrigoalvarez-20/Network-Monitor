@@ -1,21 +1,28 @@
 import { useState, useEffect } from "react";
+import { ListGroup } from "react-bootstrap";
+import RouterUser from "./router_user";
 
 const RouterUsers = ({users, route}) => {
 
     const [usersInRouter, setUsersInRouter] = useState([]);
+    const [actualRoute, setActualRoute] = useState([]);
 
     useEffect(() => {
-        setUsersInRouter(users);
-    },[users])
+        setActualRoute(route);
+    },[route])
 
     useEffect(() => {
-        console.log(usersInRouter)
-    }, [usersInRouter])
+        setUsersInRouter([...users, { "username": "", "privilege": 0, "type": "add" }]);
+    }, [users])
 
     return (
-        <div>
-            Usuarios en el router
-        </div>
+        <ListGroup variant="flush">
+            {
+                usersInRouter.map((user,idx) => {
+                    return <ListGroup.Item key={idx}><RouterUser {...user} route={actualRoute} /></ListGroup.Item>
+                })
+            }
+        </ListGroup>
     )
 
 }
