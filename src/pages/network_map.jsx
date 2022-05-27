@@ -56,7 +56,7 @@ const NetworkMap = () => {
     useEffect(() => {
         axios.get("/api/routers/graph", { headers: { "Authorization": cookies.token } }).then(response => {
             const { schema } = response.data;
-            console.log(schema);
+            //console.log(schema);
             setFullSchema(schema);
             if (schema.length === 0) {
                 //

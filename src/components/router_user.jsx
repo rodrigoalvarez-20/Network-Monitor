@@ -32,7 +32,8 @@ const RouterUser = (props) => {
             username,
             pwd,
             "privilege": parseInt(privilege),
-            "route": props.route
+            "route": props.route,
+            "method": "ssh"
         }
 
         const headers = {
@@ -66,7 +67,8 @@ const RouterUser = (props) => {
             username,
             pwd,
             "privilege": parseInt(privilege),
-            "route": props.route
+            "route": props.route,
+            "method": "ssh"
         }
 
         const headers = {
@@ -96,7 +98,8 @@ const RouterUser = (props) => {
         const data = {
             "old_username": props.username,
             "delete": true,
-            "route": props.route
+            "route": props.route,
+            "method": "ssh"
         }
 
         const headers = {

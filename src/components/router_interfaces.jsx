@@ -15,9 +15,6 @@ const RouterInterfaces = ({ interfaces, device, monitor = false, route }) => {
         setInterfacesList(interfaces);
     }, [interfaces])
 
-    useEffect(() => {
-        console.log(route);
-    }, [route]);
 
     function updateValues(ev, idx) {
         const field = ev.target.name;
