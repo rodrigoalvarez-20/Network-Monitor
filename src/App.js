@@ -13,6 +13,7 @@ import UsersPage from './pages/users_page';
 import NetworkMap from './pages/network_map';
 import Home from './pages/home';
 import ConfigsPage from './pages/configurations';
+import RouterPage from './pages/router_page';
 
 
 const App = () => {
@@ -76,6 +77,7 @@ const App = () => {
                   <Route path="/network" element={<NetworkMap />} />
                   <Route path="/users" element={<UsersPage />} />
                   <Route path="/settings" element={<ConfigsPage />} />
+                  <Route path="/devices" element={<RouterPage />} />
                 </> :
                 <>
                   <Route path="/login" element={<Login />} />

@@ -1,6 +1,6 @@
 import Network from "react-graph-vis";
 import axios from "axios";
-import { Button, Col, Container, Form, ListGroup, Offcanvas, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Container, Form, Offcanvas, Row, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,7 +17,6 @@ const NetworkMap = () => {
         "ssh_v2": false
     });
     const [displayProps, setDisplayProps] = useState(false);
-    const [isMonLoading, setIsMonLoading] = useState(false);
     const {isUpdateLoading, setIsUpdateLoading} = useState(false);
     const [cookies] = useCookies(['token']);
 
@@ -176,7 +175,7 @@ const NetworkMap = () => {
                 }).catch(errUpdate => {
                     console.log(errUpdate);
                     if(errUpdate.response.data){
-                        toast.error(cfgErr.response.data.error);
+                        toast.error(errUpdate.response.data.error);
                     }else{
                         toast.error("Ha ocurrido un error en la petición")
                     }
@@ -187,22 +186,6 @@ const NetworkMap = () => {
         }        
     }
 
-    const updateMonitoredDevice = () => {
-        setIsMonLoading(true);
-        axios.post("/api/app/configurations", {"device_mon": selectedRouter["name"]}, {headers: {"Authorization": cookies.token}}).then(cfgResp => {
-            if(cfgResp.data){
-                toast.success(cfgResp.data.message);
-            }
-        }).catch(cfgErr => {
-            if(cfgErr.response.data){
-                toast.error(cfgErr.response.data.error);
-            }else{
-                toast.error("Ha ocurrido un error en la petición")
-            }
-        }).finally(() => {
-            setIsMonLoading(false);
-        });
-    }
 
     return (
         <Container style={{ "margin": "12px auto" }}>
@@ -253,14 +236,7 @@ const NetworkMap = () => {
                                     }
                                 })
                             }
-                            <Col xs={12} sm={6} style={{ "margin": "6px auto", "textAlign":"center" }}>
-                            {
-                                isMonLoading ? 
-                                    <Spinner animation="border" /> :
-                                    <Button style={{"width":"100%"}} onClick={updateMonitoredDevice} variant="outline-warning">Monitorear</Button>
-                            }
-                                
-                            </Col>
+                            
                             <Col xs={12} sm={6} style={{ "margin": "6px auto", "textAlign": "center" }}>
                             {
                                 isUpdateLoading ? 
