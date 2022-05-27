@@ -4,10 +4,6 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { CookiesProvider } from 'react-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
-//import axios from 'axios';
-
-//axios.defaults.baseURL = "https://asr-network-api.herokuapp.com"
-//axios.defaults.baseURL = "http://127.0.0.1:5000";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
