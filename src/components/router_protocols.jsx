@@ -52,12 +52,14 @@ const RouterProtocols = (props) => {
         }else {
             setIsLoading(true);
             var data = {
-                "new_protocol": selectedProtocol,
+                "protocol": selectedProtocol,
                 "networks": nets,
+                "method": "ssh",
+                "route": props.route
             }
 
             if (selectedProtocol !== "rip"){
-                data["protocolId"] = protocolId;
+                data["protocol_id"] = protocolId;
             }
 
             const headers = {
@@ -123,7 +125,7 @@ const RouterProtocols = (props) => {
                         <Col xs={12} sm={3}>
                             <Form.Group>
                                 <Form.Label>Identificador</Form.Label>
-                                <Form.Control value={protocolId} type="text" />
+                                <Form.Control value={protocolId} onChange={(e) => setProtocolId(e.target.value)} type="text" />
                             </Form.Group>
                         </Col> : null
                 }
