@@ -120,7 +120,7 @@ const RouterPage = () => {
                                     <RouterProtocols protocols={selectedRouter["protocols"]} route={actualRoute} />
                                 </Tab>
                                 <Tab eventKey="mib" title="MIB-II">
-                                    <RouterMIB protocols={selectedRouter["mib"]} />
+                                    <RouterMIB route={actualRoute} />
                                 </Tab>
                             </Tabs>
                         </div>
