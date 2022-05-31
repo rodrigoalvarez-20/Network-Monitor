@@ -35,9 +35,9 @@ const RouterProtocols = (props) => {
             return (
                 <>
                     <div>Ejemplo:</div>
-                    <div>net 10.0.0.0 0.255.255.255</div>
-                    <div>net 127.5.0.0 0.0.255.255</div>
-                    <div>net 192.168.0.0 0.0.0.255</div>
+                    <div>net 10.0.0.0 0.255.255.255 area x</div>
+                    <div>net 127.5.0.0 0.0.255.255 area x</div>
+                    <div>net 192.168.0.0 0.0.0.255 area x</div>
                 </>
             )
         }

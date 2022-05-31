@@ -29,6 +29,7 @@ const Home = () => {
             setSelectedLogs(log_name)
             setLogsInterval(interval)
             sck.emit("get_log");
+            sck.emit("get_monitored_interfaces")
             setSckConn(sck);
         });
 
@@ -41,6 +42,11 @@ const Home = () => {
             }
             logsCont.scrollTop = logsCont.scrollHeight;
         });
+
+        sck.on("devices_monitoring", (monitored_dev => {
+            console.log("Datos de dispositivos monitoreados")
+            console.log(monitored_dev)
+        }));
 
         return () => {
             sck.disconnect()

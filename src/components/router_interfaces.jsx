@@ -67,6 +67,7 @@ const RouterInterfaces = ({ interfaces, device, monitor = false, route }) => {
         const configData = {
             device,
             monitor,
+            "ip": route[route.length - 1],
             "interfaces": monitorInterfaces
         }
 

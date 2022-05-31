@@ -55,7 +55,16 @@ const RouterPage = () => {
 
     const updateDeviceMonitorStatus = (e) => {
         setMonitorStateLoading(true);
-        const data = { "device": selectedRouter["name"], "monitor": e.target.checked}
+
+        var ip = ""
+        if (selectedRouter["type"] === "root"){
+            ip = selectedRouter["ip"]
+        }else {
+            const tmp_route = selectedRouter["route"].split(",");
+            ip = tmp_route[tmp_route.length - 1]
+        }
+
+        const data = { "device": selectedRouter["name"], "ip": ip, "monitor": e.target.checked}
         axios.post("/api/routers/monitor", data, { headers: { "Authorization": cookies.token } }).then(monResp => {
             if (monResp.data.message) {
                 toast.success(monResp.data.message);

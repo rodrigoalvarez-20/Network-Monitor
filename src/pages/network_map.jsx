@@ -163,7 +163,7 @@ const NetworkMap = () => {
             if (Object.keys(update_params) < 4){
                 alert("No se ha cambiado ningun valor");
             }else {
-                console.log(update_params);
+                //console.log(update_params);
 
                 axios.patch("/api/routers/config", update_params, { headers: { "Authorization": cookies.token } }).then(rspUpdate => {
                     if(rspUpdate.data){
