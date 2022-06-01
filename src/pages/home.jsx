@@ -1,16 +1,23 @@
-import { Container, Row, Col, Form } from "react-bootstrap";
+import { Container, Row, Col, Form, Spinner } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useCookies } from "react-cookie";
 import { available_logs, update_intervals } from "../utils/common";
 import Selector from "../components/selector";
+import { ToastContainer, toast } from 'react-toastify';
+
+
+import MetricsChart from "../components/metric_chart";
 
 const Home = () => {
 
     const [sckConn, setSckConn] = useState(null);
     const [logText, setLogText] = useState("");
     const [selectedLogs, setSelectedLogs] = useState("all");
+    const [monitoredDevices, setMonitoredDevices] = useState([])
+    const [selectedIndex, setSelectedIndex] = useState(-1)
     const [logsInterval, setLogsInterval] = useState(5);
+    const [actualMetrics, setActualMetrics] = useState({});
     const [cookies, state] = useCookies(['token']);
 
     useEffect(() => {
@@ -30,6 +37,7 @@ const Home = () => {
             setLogsInterval(interval)
             sck.emit("get_log");
             sck.emit("get_monitored_interfaces")
+            sck.emit("get_metrics")
             setSckConn(sck);
         });
 
@@ -44,9 +52,25 @@ const Home = () => {
         });
 
         sck.on("devices_monitoring", (monitored_dev => {
-            console.log("Datos de dispositivos monitoreados")
-            console.log(monitored_dev)
+            setMonitoredDevices(monitored_dev)
         }));
+
+        sck.on("metrics_data", (data => {
+            var parsed_metrics = {}
+            for (var k in data) {
+                parsed_metrics = {
+                    ...parsed_metrics,
+                    [[k]]: data[k].map(d => ({ "time": d["x"].split(" ")[1], "packets": d["y"]  }))
+                }
+            }
+            setActualMetrics(parsed_metrics)
+        }));
+
+        sck.on("metrics_error", err => {
+            console.log(err)
+            setActualMetrics({});
+            toast.error(err)
+        })
 
         return () => {
             sck.disconnect()
@@ -71,9 +95,60 @@ const Home = () => {
         }
     }
 
+    const updateSelectedMonitoredDevices = (e) => {
+        const idx = parseInt(e.target.value)
+        if (sckConn !== null && monitoredDevices.length > 0) {
+            sckConn.emit("set_selected_interface", monitoredDevices[idx])
+            setSelectedIndex(idx)
+        }
+    }
+
+    function renderMetricsData() {
+        return (
+            <Row>
+                <Col xs={12} style={{ "margin": "12px 0" }}>
+                    <MetricsChart metrics={actualMetrics["in_packets"] || []} title="Paquetes correctos recibidos" type="# Paquetes" color="#14C38E" />
+                </Col>
+                <Col xs={12} style={{ "margin": "12px 0" }}>
+                    <MetricsChart metrics={actualMetrics["in_disc"] || []} title="Paquetes recibidos descartados" type="# Paquetes" color="#EC9B3B" />
+                </Col>
+                <Col xs={12} style={{ "margin": "12px 0" }}>
+                    <MetricsChart metrics={actualMetrics["in_err"] || []} title="Paquetes recibidos con errores" type="# Paquetes" color="#D82148" />
+                </Col>
+            </Row>
+        )
+    }
+
     return (
-        <Container>
-            <h3>Inicio</h3>
+        <Container style={{ "padding": "12px" }}>
+            <h3>Dashboard</h3>
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick />
+            <Row>
+                <Col xs={12} sm={4}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Dispositivo/Interfaz monitoreada</Form.Label>
+                        <Form.Select value={selectedIndex} onChange={updateSelectedMonitoredDevices} disabled={monitoredDevices.length === 0} >
+                            <option value={-1} disabled>{ }</option>
+                            {
+                                monitoredDevices.map((dev, idx) => {
+                                    return (
+                                        <option key={dev["device"]} value={idx}>{dev["device"]} - {dev["interfaces"]["name"]}</option>
+                                    )
+                                })
+                            }
+                        </Form.Select>
+                    </Form.Group>
+                </Col>
+            </Row>
+            {
+                Object.keys(actualMetrics).length !== 0 ? renderMetricsData() : <div style={{"textAlign":"center", "margin": "24px"}}><Spinner animation="border" /></div>
+            }
+
             <Row>
                 <Col xs={12} sm={4}>
                     <Form.Group className="mb-3">
@@ -88,7 +163,6 @@ const Home = () => {
                     </Form.Group>
                 </Col>
             </Row>
-
             <Row>
                 <Col xs={12}>
                     <Form.Group className="mb-3">
