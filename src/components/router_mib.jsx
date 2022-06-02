@@ -80,8 +80,7 @@ const RouterMIB = (props) => {
             axios.post(`/api/routers/mib/${selectedHost}`, {
                 "contact": sysContact,
                 "name": sysName,
-                "location": sysLocation,
-                "description": sysDescr
+                "location": sysLocation
             }, { headers: { "Authorization": cookies.token } }).then(rspUpdate => {
                 if (rspUpdate.data.message) {
                     toast.success(rspUpdate.data.message);
@@ -127,7 +126,7 @@ const RouterMIB = (props) => {
                     <Col xs={12} sm={6} >
                         <Form.Group>
                             <Form.Label>Descripcion del dispositivo</Form.Label>
-                            <Form.Control name="sysDescr" as="textarea" rows={5} value={mibData.sysDescr} onChange={updateData} />
+                            <Form.Control name="sysDescr" as="textarea" rows={5} value={mibData.sysDescr} disabled />
                         </Form.Group>
                     </Col>
                     <Col xs={12} sm={2} >

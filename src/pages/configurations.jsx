@@ -48,18 +48,6 @@ const ConfigsPage = () => {
             select_name: "interface_interval"
         },
         {
-            label: "Actualización del dispositivo",
-            dataset: update_intervals,
-            selected: appConfigs.device_interval,
-            select_name: "device_interval"
-        },
-        {
-            label: "% paquetes recibidos",
-            dataset: packets_intervals,
-            selected: appConfigs.received_packets_percentage,
-            select_name: "received_packets_percentage"
-        },
-        {
             label: "% paquetes perdidos",
             dataset: packets_intervals,
             selected: appConfigs.lost_packets_percentage,

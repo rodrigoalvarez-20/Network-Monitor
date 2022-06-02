@@ -18,6 +18,7 @@ const Home = () => {
     const [selectedIndex, setSelectedIndex] = useState(-1)
     const [logsInterval, setLogsInterval] = useState(5);
     const [actualMetrics, setActualMetrics] = useState({});
+    const [selectedPacketType, setSelectedPacketType] = useState(0)
     const [cookies, state] = useCookies(['token']);
 
     useEffect(() => {
@@ -51,11 +52,21 @@ const Home = () => {
             logsCont.scrollTop = logsCont.scrollHeight;
         });
 
-        sck.on("devices_monitoring", (monitored_dev => {
-            setMonitoredDevices(monitored_dev)
+        sck.on("devices_monitoring", (({actual, devices}) => {
+            console.log(devices)
+            var selIdx = -1;
+            for(var item in devices){
+                if(devices[item]["interfaces"]["name"] === actual["device"] && devices[item]["addr"] === actual["addr"]){
+                    selIdx = parseInt(item)
+                    break;
+                }
+            }
+            setMonitoredDevices(devices)
+            setSelectedIndex(selIdx)
         }));
 
         sck.on("metrics_data", (data => {
+            console.log("Metricas recibidas")
             var parsed_metrics = {}
             for (var k in data) {
                 parsed_metrics = {
@@ -67,12 +78,14 @@ const Home = () => {
         }));
 
         sck.on("metrics_error", err => {
-            console.log(err)
+            console.log(err["error"])
             setActualMetrics({});
-            toast.error(err)
+            //if (err["error"])
+            //    toast.error(err["error"])
         })
 
         return () => {
+            console.log("Disconnecting socket")
             sck.disconnect()
             if (sckConn !== null) {
                 sckConn.disconnect();
@@ -103,17 +116,36 @@ const Home = () => {
         }
     }
 
+    const updatePacketsType = (e) => {
+        setSelectedPacketType( parseInt(e.target.value))
+    }
+
     function renderMetricsData() {
         return (
             <Row>
                 <Col xs={12} style={{ "margin": "12px 0" }}>
-                    <MetricsChart metrics={actualMetrics["in_packets"] || []} title="Paquetes correctos recibidos" type="# Paquetes" color="#14C38E" />
+                    {
+                        !selectedPacketType ?
+                        <MetricsChart metrics={actualMetrics["in_packets"] || []} title="Paquetes correctos recibidos" type="# Paquetes" color="#14C38E" /> :
+                        <MetricsChart metrics={actualMetrics["out_packets"] || []} title="Paquetes correctos de salida" type="# Paquetes" color="#14C38E" />
+                    }
+                    
                 </Col>
                 <Col xs={12} style={{ "margin": "12px 0" }}>
-                    <MetricsChart metrics={actualMetrics["in_disc"] || []} title="Paquetes recibidos descartados" type="# Paquetes" color="#EC9B3B" />
+                    {
+                        !selectedPacketType ? 
+                        <MetricsChart metrics={actualMetrics["in_disc"] || []} title="Paquetes recibidos descartados" type="# Paquetes" color="#EC9B3B" /> :
+                        <MetricsChart metrics={actualMetrics["out_disc"] || []} title="Paquetes de salida descartados" type="# Paquetes" color="#EC9B3B" />
+                    }
+                    
                 </Col>
                 <Col xs={12} style={{ "margin": "12px 0" }}>
-                    <MetricsChart metrics={actualMetrics["in_err"] || []} title="Paquetes recibidos con errores" type="# Paquetes" color="#D82148" />
+                    {
+                        !selectedPacketType ?
+                        <MetricsChart metrics={actualMetrics["in_err"] || []} title="Paquetes recibidos con errores" type="# Paquetes" color="#D82148" /> :
+                        <MetricsChart metrics={actualMetrics["out_err"] || []} title="Paquetes de salida con errores" type="# Paquetes" color="#D82148" />
+                    }
+                    
                 </Col>
             </Row>
         )
@@ -144,9 +176,18 @@ const Home = () => {
                         </Form.Select>
                     </Form.Group>
                 </Col>
+                <Col xs={12} sm={4}>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Tipo de paquetes</Form.Label>
+                        <Form.Select value={selectedPacketType} onChange={updatePacketsType} disabled={monitoredDevices.length === 0} >
+                            <option value={0}>Entrada</option>
+                            <option value={1}>Salida</option>
+                        </Form.Select>
+                    </Form.Group>
+                </Col>
             </Row>
             {
-                Object.keys(actualMetrics).length !== 0 ? renderMetricsData() : <div style={{"textAlign":"center", "margin": "24px"}}><Spinner animation="border" /></div>
+                Object.keys(actualMetrics).length !== 0 ? renderMetricsData() : null
             }
 
             <Row>
